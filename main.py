@@ -1,50 +1,82 @@
 from random import randint
 
 
-def add_arrays(first_array, second_array):
-    result_array = []
-    carry = 0
-    for i in range(9, -1, -1):
-        total = first_array[i] + second_array[i] + carry
-        carry = total // 10
+def fill_array_with_random_numbers(arr, size):
+    for i in range(size):
+        arr.append(randint(1, 9))
+
+
+def add_arrays_with_carry(first_array, second_array):
+    temp = 0
+    max_size = max(len(first_array), len(second_array))
+
+    while len(first_array) < len(second_array):
+        first_array.insert(0, 0)
+    while len(second_array) < len(first_array):
+        second_array.insert(0, 0)
+
+    for i in range(max_size - 1, -1, -1):
+        first_digit = first_array[i] if i < len(first_array) else 0
+        second_digit = second_array[i] if i < len(second_array) else 0
+        total = first_digit + second_digit + temp
+        temp = total // 10
         result_array.insert(0, total % 10)
-    if carry > 0:
-        result_array.insert(0, carry)
+
+    if temp > 0:
+        result_array.insert(0, temp)
+
     return result_array
 
 
-def subtract_arrays(first_array, second_array):
-    result_array = []
-    borrow = 0
-    for i in range(9, -1, -1):
-        diff = first_array[i] - second_array[i] - borrow
-        if diff < 0:
-            diff += 10
-            borrow = 1
+def subtract_arrays_with_borrow(first_array, second_array):
+    temp = 0
+    max_size = max(len(first_array), len(second_array))
+
+    while len(first_array) < len(second_array):
+        first_array.insert(0, 0)
+    while len(second_array) < len(first_array):
+        second_array.insert(0, 0)
+
+    for i in range(max_size - 1, -1, -1):
+        first_digit = first_array[i] if i < len(first_array) else 0
+        second_digit = second_array[i] if i < len(second_array) else 0
+        total = first_digit - second_digit - temp
+
+        if total < 0:
+            total += 10
+            temp = 1
         else:
-            borrow = 0
-        result_array.insert(0, diff)
+            temp = 0
+
+        result_array.insert(0, total)
+
+    # Remove leading zeros
+    while len(result_array) > 1 and result_array[0] == 0:
+        result_array.pop(0)
+
     return result_array
 
-
-operation = input("Choose operation (+ or -): ")
 
 first_array = []
 second_array = []
+result_array = []
 
-for i in range(10):
-    first_array.append(randint(0, 9))
-    second_array.append(randint(0, 9))
+first_arr_size = int(input("Enter size of 1 arr: "))
+second_arr_size = int(input("Enter size of 2 arr: "))
+
+fill_array_with_random_numbers(first_array, first_arr_size)
+fill_array_with_random_numbers(second_array, second_arr_size)
+
+operation_choice = input("Enter 'add' for addition or 'subtract' for subtraction: ")
+
+if operation_choice.lower() == 'add':
+    add_arrays_with_carry(first_array, second_array)
+elif operation_choice.lower() == 'subtract':
+    subtract_arrays_with_borrow(first_array, second_array)
+else:
+    print("Invalid choice. Please enter 'add' or 'subtract'.")
+
 
 print(f"First array: {first_array}")
 print(f"Second array: {second_array}")
-
-if operation == '+':
-    result_array = add_arrays(first_array, second_array)
-    print(f"result (+): {result_array}")
-elif operation == '-':
-    result_array = subtract_arrays(first_array, second_array)
-    print(f"Result (-): {result_array}")
-else:
-    print("Wrong operation. Please, choose + or -.")
-
+print(f"Addition Result: {result_array}")
